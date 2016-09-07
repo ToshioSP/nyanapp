@@ -74,6 +74,26 @@ namespace Assets.Script
 
             transPop.localScale = new Vector3(1, 1, 1);
             transPop.localPosition = new Vector3(0, 0, 0);
+            Text textPop = GameObject.Find("PopInfoText").GetComponent<Text>();
+
+            switch (argActId)
+            {
+                case 3:
+                    textPop.text = "水" + GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>() + "ml\r\n登録する？";
+                    break;
+                case 4:
+                    textPop.text = "ブラッシング\r\n登録する？";
+                    break;
+                case 5:
+                    textPop.text = "シャンプー\r\n登録する？";
+                    break;
+                case 6:
+                    textPop.text = "病院\r\n登録する？";
+                    break;
+                default:
+                    break;
+            }
+
 
             GameObject okbutton = objPopup.transform.Find("Pop/btnOK").gameObject;
             Button btnOk = okbutton.GetComponent<Button>();
@@ -86,6 +106,7 @@ namespace Assets.Script
 
         public void popInput(int argActId )
         {
+            
             Transform transPop;
             objPopup = Resources.Load("Prefab/InputPopup") as GameObject;
             objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
@@ -107,13 +128,13 @@ namespace Assets.Script
 
         public void checkExec(int argActId,string memo = "0")
         {
+            
             Transform transPop;
             objPopup = Resources.Load("Prefab/Popup") as GameObject;
             objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
             objPopup.name = "PopUp";
             transPop = objPopup.transform;
             transPop.SetParent(GameObject.Find("PopupArea").transform);
-
             transPop.localScale = new Vector3(1, 1, 1);
             transPop.localPosition = new Vector3(0, 0, 0);
 
