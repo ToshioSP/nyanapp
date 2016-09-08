@@ -33,7 +33,8 @@ public class SqliteController : MonoBehaviour {
             string query = "insert into catprofile (catname,birthday,sex) values(\" ";
             query = query + catName + "\",\"" + birthday + "\",\"" + sex + "\")";
             print(query);
-            DataTable dataTable = sqlDB.ExecuteQuery(query);
+//            DataTable 
+                dataTable = sqlDB.ExecuteQuery(query);
         }
         catch (Exception e)
         {
@@ -50,7 +51,7 @@ public class SqliteController : MonoBehaviour {
 
         try
         {
-            string query = "insert into cathistory (action_date,action_time,action_id) values ( date('now', 'localtime') ,time('now', 'localtime'), ";
+            string query = "insert into cathistory (catid,action_date,action_time,action_id) values ('" + PlayerPrefs.GetString("SelectCat") + "', date('now', 'localtime') ,time('now', 'localtime'), ";
             query = query + argActionId.ToString() + ")";
             dataTable = sqlDB.ExecuteQuery(query);
         }
@@ -58,7 +59,7 @@ public class SqliteController : MonoBehaviour {
         {
             print(e.Message.ToString());
             print(e.StackTrace);
-            string baseFilePath = Application.streamingAssetsPath + "/" + dbfileName;
+//            string baseFilePath = Application.streamingAssetsPath + "/" + dbfileName;
             GameObject.Find("ErrorText").GetComponent<Text>().text = e.Message.ToString() + "\r\n" + e.StackTrace.ToString() ;
         }
     }
@@ -72,7 +73,8 @@ public class SqliteController : MonoBehaviour {
             //                    query = query + argActionId.ToString() + ")";
             string query = "select * from cathistory ";
             //            string query = "delete from cathistory ";
-            DataTable dataTable = sqlDB.ExecuteQuery(query);
+            //DataTable 
+                dataTable = sqlDB.ExecuteQuery(query);
             foreach (DataRow dr in dataTable.Rows)
             {
 

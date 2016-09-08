@@ -136,8 +136,8 @@ public class HistoryViewBehaviourDetail : MonoBehaviour
             SqliteDatabase sqlDB = new SqliteDatabase(filePath);
             string query = "delete from cathistory where seqno = \"" + argSeq + "\"";
 
-            DataTable dataTable = sqlDB.ExecuteQuery(query);
-
+            //            DataTable dataTable = sqlDB.ExecuteQuery(query);
+            sqlDB.ExecuteQuery(query);
             this.Start();
         }
         catch (Exception e)

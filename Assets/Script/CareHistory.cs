@@ -15,6 +15,13 @@ namespace Assets.Script
         {
             strMoveSceneName = "Main";
         }
+        public void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                MoveScene();
+            }
+        }
 
         public void MoveScene()
         {

@@ -15,7 +15,7 @@ namespace Assets.Script
         void Start()
         {
 
-//            GameObject.Find("memo").GetComponent<Button>()
+            GameObject.Find("InputField").GetComponent<InputField>().text = "0";
 
         }
 
@@ -36,25 +36,26 @@ namespace Assets.Script
                 {
                     case 3:
                         Text textmemo = GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>();
-                        query = "insert into cathistory (action_date,action_time,action_id,amount) values ( date('now', 'localtime') ,time('now', 'localtime'), ";
+                        query = "insert into cathistory (catid,action_date,action_time,action_id,amount) values ('" + PlayerPrefs.GetString("SelectCat") + "', date('now', 'localtime') ,time('now', 'localtime'), ";
                         query = query + argActionId.ToString() + "," + amount + ")";
 
                         amount = int.Parse(textmemo.text);
                         textmemo.text = "0";
                         break;
                     case 7:
-                        query = "insert into cathistory (action_date,action_time,action_id,memo) values ( date('now', 'localtime') ,time('now', 'localtime'), ";
+                        query = "insert into cathistory (catid,action_date,action_time,action_id,memo) values ('" + PlayerPrefs.GetString("SelectCat") + "', date('now', 'localtime') ,time('now', 'localtime'), ";
                         query = query + argActionId.ToString() + ",\"" + memo + "\")";
 
                         break;
                     default:
-                        query = "insert into cathistory (action_date,action_time,action_id) values ( date('now', 'localtime') ,time('now', 'localtime'), ";
+                        query = "insert into cathistory (catid,action_date,action_time,action_id) values ('" + PlayerPrefs.GetString("SelectCat") + "', date('now', 'localtime') ,time('now', 'localtime'), ";
                         query = query + argActionId.ToString() + ")";
 
                         break;
                 }
                 print(query);
-                DataTable dataTable = sqlDB.ExecuteQuery(query);
+//                DataTable dataTable = 
+                    sqlDB.ExecuteQuery(query);
             }
             catch (Exception e)
             {
@@ -79,7 +80,7 @@ namespace Assets.Script
             switch (argActId)
             {
                 case 3:
-                    textPop.text = "水" + GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>() + "ml\r\n登録する？";
+                    textPop.text = "水" + GameObject.Find("InputField").GetComponent<InputField>().text + "mml\r\n登録する？";
                     break;
                 case 4:
                     textPop.text = "ブラッシング\r\n登録する？";
@@ -93,7 +94,6 @@ namespace Assets.Script
                 default:
                     break;
             }
-
 
             GameObject okbutton = objPopup.transform.Find("Pop/btnOK").gameObject;
             Button btnOk = okbutton.GetComponent<Button>();
@@ -175,7 +175,14 @@ namespace Assets.Script
         {
             Destroy(objPopup);
         }
-
+        
+        public void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                MoveScene(1);
+            }
+        }
 
         public void MoveScene(int id)
         {
@@ -183,6 +190,9 @@ namespace Assets.Script
             {
                 case 1:
                     SceneManager.LoadScene("Main");
+                    break;
+                case 2:
+                    SceneManager.LoadScene("ExtraCare2");
                     break;
 
                 default:

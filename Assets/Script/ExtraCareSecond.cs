@@ -23,14 +23,14 @@ namespace Assets.Script
             inputTime = GameObject.Find("TIME").GetComponent<InputField>();
 
             string dbfileName = "nyanappdb.db";
-            string baseFilePath = Application.streamingAssetsPath + "/" + dbfileName;
+//            string baseFilePath = Application.streamingAssetsPath + "/" + dbfileName;
             string filePath = Application.persistentDataPath + "/" + dbfileName;
 
             SqliteDatabase sqlDB = new SqliteDatabase(filePath);
             string query = "select date('now', 'localtime') as date ,time('now', 'localtime') as time";
             DataTable dataTable = sqlDB.ExecuteQuery(query);
 
-
+            GameObject.Find("InputField").GetComponent<InputField>().text = "0";
             dataTable = sqlDB.ExecuteQuery(query);
             foreach (DataRow dr in dataTable.Rows)
             {
@@ -39,6 +39,13 @@ namespace Assets.Script
                 inputTime.text = dr["time"].ToString().Substring(0, 2) + dr["time"].ToString().Substring(3, 2) + dr["time"].ToString().Substring(6, 2);
             }
 
+        }
+        public void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                MoveScene(1);
+            }
         }
 
         GameObject objPopup;
@@ -58,8 +65,8 @@ namespace Assets.Script
                 {
                     case 3:
                         Text textmemo = GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>();
-                        query = "insert into cathistory (action_date,action_time,action_id,amount) values ( '" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
-
+                        query = "insert into cathistory (catid,action_date,action_time,action_id,amount) values ( '" + PlayerPrefs.GetString("SelectCat") + "','" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
+                        
 //                        query = "insert into cathistory (action_date,action_time,action_id,amount) values ( date('now', 'localtime') ,time('now', 'localtime'), ";
                         query = query + argActionId.ToString() + "," + amount + ")";
 
@@ -67,18 +74,18 @@ namespace Assets.Script
                         textmemo.text = "0";
                         break;
                     case 7:
-                        query = "insert into cathistory (action_date,action_time,action_id,memo) values ( '" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
+                        query = "insert into cathistory (catid,action_date,action_time,action_id,memo) values ('" + PlayerPrefs.GetString("SelectCat") + "', '" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
                         query = query + argActionId.ToString() + ",\"" + memo + "\")";
 
                         break;
                     default:
-                        query = "insert into cathistory (action_date,action_time,action_id) values ('" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
+                        query = "insert into cathistory (catid,action_date,action_time,action_id) values ('" + PlayerPrefs.GetString("SelectCat") + "','" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
                         query = query + argActionId.ToString() + ")";
 
                         break;
                 }
-                print(query);
-                DataTable dataTable = sqlDB.ExecuteQuery(query);
+                //DataTable dataTable = 
+                    sqlDB.ExecuteQuery(query);
             }
             catch (Exception e)
             {
@@ -103,17 +110,24 @@ namespace Assets.Script
 
             switch (argActId)
             {
+                case 1:
+                    textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\nおしっこ\r\n登録する？";
+                    break;
+                case 2:
+                    textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\nうんち\r\n登録する？";
+                    break;
+
                 case 3:
-                    textPop.text = "水" + GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>() + "ml\r\n登録する？";
+                    textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\n水" + GameObject.Find("InputField").GetComponent<InputField>().text + "mml\r\n登録する？";
                     break;
                 case 4:
-                    textPop.text = "ブラッシング\r\n登録する？";
+                    textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\nブラッシング\r\n登録する？";
                     break;
                 case 5:
-                    textPop.text = "シャンプー\r\n登録する？";
+                    textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\nシャンプー\r\n登録する？";
                     break;
                 case 6:
-                    textPop.text = "病院\r\n登録する？";
+                    textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\n病院\r\n登録する？";
                     break;
                 default:
                     break;
@@ -208,6 +222,9 @@ namespace Assets.Script
             {
                 case 1:
                     SceneManager.LoadScene("Main");
+                    break;
+                case 2:
+                    SceneManager.LoadScene("ExtraCare");
                     break;
 
                 default:

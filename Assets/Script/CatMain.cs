@@ -21,6 +21,8 @@ namespace Assets.Script
         public string lastpiss;
         public string lastshit;
         public WWW www;
+
+
         public void Awake()
         {
 
@@ -31,49 +33,44 @@ namespace Assets.Script
                 string baseFilePath = Application.streamingAssetsPath + "/" + dbfileName;
                 string filePath = Application.persistentDataPath + "/" + dbfileName;
 
-                // 初期データ登録(未登録時のみ)
-                if (!PlayerPrefs.HasKey("SelectCat")) PlayerPrefs.SetString("SelectCat", "1");
+
+            // 初期データ登録(未登録時のみ)
+            if (!PlayerPrefs.HasKey("SelectCat")) PlayerPrefs.SetString("SelectCat", "1");
                 if (!PlayerPrefs.HasKey("SelectCatName")) PlayerPrefs.SetString("SelectCatName", "猫1");
 
 
                 if (!File.Exists(filePath))
                 {
-                    www = new WWW("file://" + baseFilePath);
+                //                    www = new WWW("file://" + baseFilePath);
+                    www = new WWW(baseFilePath);
+                    print(baseFilePath);
                     while (!www.isDone)
                     {
                         //NOP
                     }
                     File.WriteAllBytes(filePath, www.bytes);
                 }
-                else
-                {
-                    www = new WWW("file://" + baseFilePath);
-                    while (!www.isDone)
-                    {
-                        //NOP
-                    }
 
-                }
-
-                SqliteDatabase sqlDB = new SqliteDatabase(filePath);
+            SqliteDatabase sqlDB = new SqliteDatabase(dbfileName);
                 string query = "select * from catprofile where catid = \"" + PlayerPrefs.GetString("SelectCat") + "\"";
-                DataTable dataTable = sqlDB.ExecuteQuery(query);
-                if (dataTable.Rows.Count == 0)
-                {
-                    query = "select max(catid) as catid from cathistory";
-                    dataTable = sqlDB.ExecuteQuery(query);
-                    if (dataTable.Rows.Count == 0)
-                    {
-                        AddCat();
-                        query = "select max(catid) as catid from cathistory";
-                        dataTable = sqlDB.ExecuteQuery(query);
-                        foreach (DataRow dr in dataTable.Rows)
-                        {
-                            PlayerPrefs.SetString("SelectCat", dr["catid"].ToString());
-                        }
-                    }
-                }
+                DataTable dataTable;
+                                dataTable = sqlDB.ExecuteQuery(query);
 
+                                                if (dataTable.Rows.Count == 0)
+                                                {
+                                                    query = "select max(catid) as catid from cathistory";
+                                                    dataTable = sqlDB.ExecuteQuery(query);
+                                                    if (dataTable.Rows.Count == 0)
+                                                    {
+                                                        AddCat();
+                                                        query = "select max(catid) as catid from cathistory";
+                                                        dataTable = sqlDB.ExecuteQuery(query);
+                                                        foreach (DataRow dr in dataTable.Rows)
+                                                        {
+                                                            PlayerPrefs.SetString("SelectCat", dr["catid"].ToString());
+                                                        }
+                                                    }
+                                                }
                 query = "select max(action_date||\" \"||action_time) as a  from cathistory where action_id = 1";
                 dataTable = sqlDB.ExecuteQuery(query);
                 if (dataTable.Rows.Count == 0)
@@ -113,7 +110,11 @@ namespace Assets.Script
 
         private void Update()
         {
-//            nowtext.text = DateTime.Now.Hour.ToString() + ":" + DateTime.Now.Minute.ToString();
+            nowtext.text = DateTime.Now.Hour.ToString() + ":" + DateTime.Now.Minute.ToString();
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                Application.Quit();
+            }
         }
 
         public void checkExec(int argActId)
