@@ -66,11 +66,10 @@ namespace Assets.Script
                     case 3:
                         Text textmemo = GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>();
                         query = "insert into cathistory (catid,action_date,action_time,action_id,amount) values ( '" + PlayerPrefs.GetString("SelectCat") + "','" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
-                        
-//                        query = "insert into cathistory (action_date,action_time,action_id,amount) values ( date('now', 'localtime') ,time('now', 'localtime'), ";
+                        amount = int.Parse(textmemo.text);
+                        //                        query = "insert into cathistory (action_date,action_time,action_id,amount) values ( date('now', 'localtime') ,time('now', 'localtime'), ";
                         query = query + argActionId.ToString() + "," + amount + ")";
 
-                        amount = int.Parse(textmemo.text);
                         textmemo.text = "0";
                         break;
                     case 7:
@@ -116,9 +115,8 @@ namespace Assets.Script
                 case 2:
                     textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\nうんち\r\n登録する？";
                     break;
-
                 case 3:
-                    textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\n水" + GameObject.Find("InputField").GetComponent<InputField>().text + "mml\r\n登録する？";
+                    textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\n飲水量" + GameObject.Find("InputField").GetComponent<InputField>().text + "mml\r\n登録する？";
                     break;
                 case 4:
                     textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\nブラッシング\r\n登録する？";

@@ -19,7 +19,7 @@ public class HistoryViewBehaviourDetail : MonoBehaviour
         try
         {
             SqliteDatabase sqlDB = new SqliteDatabase(filePath);
-            string strOrder = " order by action_id asc,action_time desc";
+            string strOrder = " order by action_time desc";
             //                    string query = "insert into cathistory (action_date,action_id) values ( datetime('now', 'localtime') , ";
             //                    query = query + argActionId.ToString() + ")";
             string query = "select * from cathistory ";

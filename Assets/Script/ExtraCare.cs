@@ -36,10 +36,11 @@ namespace Assets.Script
                 {
                     case 3:
                         Text textmemo = GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>();
+                        amount = int.Parse(textmemo.text);
+
                         query = "insert into cathistory (catid,action_date,action_time,action_id,amount) values ('" + PlayerPrefs.GetString("SelectCat") + "', date('now', 'localtime') ,time('now', 'localtime'), ";
                         query = query + argActionId.ToString() + "," + amount + ")";
 
-                        amount = int.Parse(textmemo.text);
                         textmemo.text = "0";
                         break;
                     case 7:
@@ -80,7 +81,7 @@ namespace Assets.Script
             switch (argActId)
             {
                 case 3:
-                    textPop.text = "水" + GameObject.Find("InputField").GetComponent<InputField>().text + "mml\r\n登録する？";
+                    textPop.text = "飲水量" + GameObject.Find("InputField").GetComponent<InputField>().text + "mml\r\n登録する？";
                     break;
                 case 4:
                     textPop.text = "ブラッシング\r\n登録する？";
