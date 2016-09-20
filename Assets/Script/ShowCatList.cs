@@ -3,7 +3,6 @@ using System.Collections;
 using System;
 using Assets.Script;
 using UnityEngine.UI;
-using Assets.Script;
 using UnityEngine.SceneManagement;
 public class ShowCatList : SqliteController
 {

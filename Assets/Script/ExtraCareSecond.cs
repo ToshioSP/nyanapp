@@ -17,7 +17,7 @@ namespace Assets.Script
         InputField inputTime;
         void Start()
         {
-
+            GameObject.Find("OmakeButton").GetComponent<Button>().onClick.AddListener(PlayAdMovie);
             inputYear = GameObject.Find("YEAR").GetComponent<InputField>();
             inputDay = GameObject.Find("DAY").GetComponent<InputField>();
             inputTime = GameObject.Find("TIME").GetComponent<InputField>();
@@ -47,6 +47,96 @@ namespace Assets.Script
                 MoveScene(1);
             }
         }
+
+        //動画再生開始
+        public void PlayAdMovie()
+        {
+            //再生できるか確認
+            if (MovieAdManager.Instance.CanPlay())
+            {
+                //コールバックメソッドを指定して動画再生
+                MovieAdManager.Instance.Play(OnFinished, OnFailed, OnFailed);
+            }
+        }
+
+        //動画視聴完了時
+        private void OnFinished()
+        {
+            ExecUranai();
+            Debug.Log("完了");
+        }
+
+        //動画視聴失敗時
+        private void OnFailed()
+        {
+            Debug.Log("失敗");
+        }
+
+        //動画視聴キャンセル時
+        private void OnSkipped()
+        {
+            Debug.Log("キャンセル");
+        }
+
+        public void ExecUranai()
+        {
+            Transform transPop;
+
+            objPopup = Resources.Load("Prefab/PopupUranai") as GameObject;
+            objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
+            objPopup.name = "PopUp";
+            transPop = objPopup.transform;
+            transPop.SetParent(GameObject.Find("PopupArea").transform);
+
+            transPop.localScale = new Vector3(1, 1, 1);
+            transPop.localPosition = new Vector3(0, 0, 0);
+            Text textPop = GameObject.Find("PopInfoText").GetComponent<Text>();
+            Text textPop2 = GameObject.Find("PopInfoText2").GetComponent<Text>();
+
+            int kekka = UnityEngine.Random.Range(1,8);
+
+            switch (kekka)
+            {
+                case 1:
+                    textPop.text = "大吉！！！！";
+                    textPop2.text = "今日はいいことありそう";
+                    break;
+                case 2:
+                    textPop.text = "吉！！！";
+                    textPop2.text = "実は大吉の次に良いんだよ";
+                    break;
+                case 3:
+                    textPop.text = "中吉！！";
+                    textPop2.text = "まあまあいい感じ";
+                    break;
+                case 4:
+                    textPop.text = "小吉！";
+                    textPop2.text = "ささやかな幸せ";
+                    break;
+                case 5:
+                    textPop.text = "末吉";
+                    textPop2.text = "セーフ！";
+                    break;
+                case 6:
+                    textPop.text = "凶";
+                    textPop2.text = "まあ、まあね…！";
+                    break;
+                case 7:
+                    textPop.text = "大凶";
+                    textPop2.text = "……。";
+                    break;
+                case 8:
+                    textPop.text = "狂";
+                    textPop2.text = "バグがなきゃ出ないはず";
+                    break;
+                default:
+                    break;
+            }
+            GameObject ngbutton = objPopup.transform.Find("Pop/btnNG").gameObject;
+            Button btnNg = ngbutton.GetComponent<Button>();
+            btnNg.onClick.AddListener(() => Destroy(objPopup));
+        }
+
 
         GameObject objPopup;
         public void InsertDb(int argActionId, string memo = null)
@@ -131,7 +221,6 @@ namespace Assets.Script
                     break;
             }
 
-
             GameObject okbutton = objPopup.transform.Find("Pop/btnOK").gameObject;
             Button btnOk = okbutton.GetComponent<Button>();
             btnOk.onClick.AddListener(() => ExecOk(argActId));
@@ -139,6 +228,7 @@ namespace Assets.Script
             GameObject ngbutton = objPopup.transform.Find("Pop/btnNG").gameObject;
             Button btnNg = ngbutton.GetComponent<Button>();
             btnNg.onClick.AddListener(() => ExecNg(argActId));
+            
         }
 
         public void popInput(int argActId )

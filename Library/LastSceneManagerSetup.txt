@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scene/ExtraCare.unity
+- path: Assets/Scene/ExtraCare2.unity
   isLoaded: 1
   isActive: 1
