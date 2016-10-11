@@ -52,7 +52,7 @@ public class HistoryViewBehaviourDetail : MonoBehaviour
                         break;
                     case 2:
                         strText = strText + "糞";
-                        if ((string) dr["memo"] != null){
+                        if ((string) dr["memo"] != ""){
                             strText = strText + "メモ：" + (string)dr["memo"];
                         }
                         break;

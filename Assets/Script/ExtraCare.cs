@@ -35,13 +35,13 @@ namespace Assets.Script
                 switch (argActionId)
                 {
                     case 3:
-                        Text textmemo = GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>();
-                        amount = int.Parse(textmemo.text);
+                        string textmemo = GameObject.Find("InputField").GetComponent<InputField>().text;
+                        amount = int.Parse(textmemo);
 
                         query = "insert into cathistory (catid,action_date,action_time,action_id,amount) values ('" + PlayerPrefs.GetString("SelectCat") + "', date('now', 'localtime') ,time('now', 'localtime'), ";
                         query = query + argActionId.ToString() + "," + amount + ")";
-
-                        textmemo.text = "0";
+                        Text texta = GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>();
+                        texta.text = "0";
                         break;
                     case 7:
                         query = "insert into cathistory (catid,action_date,action_time,action_id,memo) values ('" + PlayerPrefs.GetString("SelectCat") + "', date('now', 'localtime') ,time('now', 'localtime'), ";
@@ -81,7 +81,7 @@ namespace Assets.Script
             switch (argActId)
             {
                 case 3:
-                    textPop.text = "飲水量" + GameObject.Find("InputField").GetComponent<InputField>().text + "mml\r\n登録する？";
+                    textPop.text = "飲水量" + GameObject.Find("InputField").GetComponent<InputField>().text + "ml\r\n登録する？";
                     break;
                 case 4:
                     textPop.text = "ブラッシング\r\n登録する？";
@@ -154,7 +154,7 @@ namespace Assets.Script
                 switch (argActId)
                 {
                     case 7:
-                        string memo = GameObject.Find("PopUp").transform.Find("Pop/InputField/Text").GetComponent<Text>().text;
+                        string memo = GameObject.Find("PopUp").transform.Find("Pop/InputField").GetComponent<InputField>().text;
                         InsertDb(argActId,memo);
                         break;
 

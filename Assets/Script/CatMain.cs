@@ -188,7 +188,7 @@ namespace Assets.Script
                         break;
                     case 2:
                         GameObject ob = GameObject.Find("PopUp/Pop");
-                        InsertDbShit(argActId,ob.transform.Find("Toggle").GetComponent<Toggle>().isOn,ob.transform.Find("InputField/Text").GetComponent<Text>().text);
+                        InsertDbShit(argActId,ob.transform.Find("Toggle").GetComponent<Toggle>().isOn,ob.transform.Find("InputField").GetComponent<InputField>().text);
                         break;
                     default:
                         break;

@@ -153,14 +153,20 @@ namespace Assets.Script
                 string query;
                 switch (argActionId)
                 {
-                    case 3:
-                        Text textmemo = GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>();
-                        query = "insert into cathistory (catid,action_date,action_time,action_id,amount) values ( '" + PlayerPrefs.GetString("SelectCat") + "','" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
-                        amount = int.Parse(textmemo.text);
-                        //                        query = "insert into cathistory (action_date,action_time,action_id,amount) values ( date('now', 'localtime') ,time('now', 'localtime'), ";
-                        query = query + argActionId.ToString() + "," + amount + ")";
 
-                        textmemo.text = "0";
+                    case 2:
+                        query = "insert into cathistory (catid,action_date,action_time,action_id,memo) values ('" + PlayerPrefs.GetString("SelectCat") + "', '" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
+                        query = query + argActionId.ToString() + ",\"" + memo + "\")";
+                        break;
+
+                    case 3:
+                        string textmemo = GameObject.Find("InputField").GetComponent<InputField>().text;
+                        amount = int.Parse(textmemo);
+
+                        query = "insert into cathistory (catid,action_date,action_time,action_id,amount) values ('" + PlayerPrefs.GetString("SelectCat") + "', date('now', 'localtime') ,time('now', 'localtime'), ";
+                        query = query + argActionId.ToString() + "," + amount + ")";
+                        Text texta = GameObject.Find("InputField").transform.FindChild("Text").GetComponent<Text>();
+                        texta.text = "0";
                         break;
                     case 7:
                         query = "insert into cathistory (catid,action_date,action_time,action_id,memo) values ('" + PlayerPrefs.GetString("SelectCat") + "', '" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
@@ -206,7 +212,7 @@ namespace Assets.Script
                     textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\nうんち\r\n登録する？";
                     break;
                 case 3:
-                    textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\n飲水量" + GameObject.Find("InputField").GetComponent<InputField>().text + "mml\r\n登録する？";
+                    textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\n飲水量" + GameObject.Find("InputField").GetComponent<InputField>().text + "ml\r\n登録する？";
                     break;
                 case 4:
                     textPop.text = inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + " " + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "\r\nブラッシング\r\n登録する？";
@@ -253,9 +259,31 @@ namespace Assets.Script
             btnNg.onClick.AddListener(() => ExecNg(argActId));
         }
 
+        public void popShit(int argActId)
+        {
+            Transform transPop;
+
+            objPopup = Resources.Load("Prefab/InputPopupShit") as GameObject;
+            objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
+            objPopup.name = "PopUp";
+            transPop = objPopup.transform;
+            transPop.SetParent(GameObject.Find("PopupArea").transform);
+
+            transPop.localScale = new Vector3(1, 1, 1);
+            transPop.localPosition = new Vector3(0, 0, 0);
+
+            GameObject okbutton = objPopup.transform.Find("Pop/btnOK").gameObject;
+            Button btnOk = okbutton.GetComponent<Button>();
+            btnOk.onClick.AddListener(() => ExecOk(argActId));
+
+            GameObject ngbutton = objPopup.transform.Find("Pop/btnNG").gameObject;
+            Button btnNg = ngbutton.GetComponent<Button>();
+            btnNg.onClick.AddListener(() => ExecNg(argActId));
+
+        }
+
         public void checkExec(int argActId,string memo = "0")
         {
-            
             Transform transPop;
             objPopup = Resources.Load("Prefab/Popup") as GameObject;
             objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
@@ -276,11 +304,24 @@ namespace Assets.Script
 
         public void ExecOk(int argActId)
         {
-            try {
+                string memo = "";
+
                 switch (argActId)
                 {
+                    case 2:
+                        GameObject obj = GameObject.Find("PopUp/Pop/");
+                        if (obj.transform.Find("Toggle").GetComponent<Toggle>().isOn)
+                        {
+                            memo = "【異】";
+                        }
+//                        InputField inputfield = 
+                        memo = memo + obj.transform.Find("InputField").GetComponent<InputField>().text;
+                    print(memo);
+                        InsertDb(argActId, memo);
+
+                        break;
                     case 7:
-                        string memo = GameObject.Find("PopUp").transform.Find("Pop/InputField/Text").GetComponent<Text>().text;
+                        memo = GameObject.Find("PopUp").transform.Find("Pop/InputField").GetComponent<InputField>().text;
                         InsertDb(argActId,memo);
                         break;
 
@@ -290,12 +331,6 @@ namespace Assets.Script
                 }
                 Destroy(objPopup);
                 print(argActId);
-            }
-            catch(Exception e)
-            {
-                print(e.Message.ToString());
-                print(e.StackTrace.ToString());
-            }
         }
 
         public void ExecNg(int argActId)
