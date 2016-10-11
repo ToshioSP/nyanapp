@@ -21,7 +21,12 @@ namespace Assets.Script
         public string lastpiss;
         public string lastshit;
         public WWW www;
+        public bool bShitStatus;
+        public string shitMemo;
 
+
+        SqliteDatabase sqlDB;
+        DataTable dataTable;
 
         public void Awake()
         {
@@ -71,13 +76,13 @@ namespace Assets.Script
                                                         }
                                                     }
                                                 }
+/*
                 query = "select max(action_date||\" \"||action_time) as a  from cathistory where action_id = 1";
                 dataTable = sqlDB.ExecuteQuery(query);
                 if (dataTable.Rows.Count == 0)
                 {
                 }
-
-
+                */
                 // データ取得処理開始
 
                 query = "select max(action_date||\" \"||action_time) as a  from cathistory where action_id = 1";
@@ -119,28 +124,49 @@ namespace Assets.Script
 
         public void checkExec(int argActId)
         {
-            try {
                 Transform transPop;
-                objPopup = Resources.Load("Prefab/Popup") as GameObject;
-                objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
-                objPopup.name = "PopUp";
-                transPop = objPopup.transform;
-                transPop.SetParent(GameObject.Find("PopupArea").transform);
-                transPop.localScale = new Vector3(1, 1, 1);
-                transPop.localPosition = new Vector3(0, 0, 0);
-
+                Text textpopup;
                 string poptext = null;
-                Text textpopup = transPop.FindChild("PopInfoText").GetComponent<Text>();
 
                 switch (argActId)
                 {
                     case 1:
+                        objPopup = Resources.Load("Prefab/Popup") as GameObject;
+                        objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
+                        objPopup.name = "PopUp";
+                        transPop = objPopup.transform;
+                        textpopup = transPop.FindChild("PopInfoText").GetComponent<Text>();
+                        transPop.SetParent(GameObject.Find("PopupArea").transform);
+                        transPop.localScale = new Vector3(1, 1, 1);
+                        transPop.localPosition = new Vector3(0, 0, 0);
                         poptext = "おしっこ履歴を登録します\r\n前回\r\n" + poptext + lastpiss;
                         break;
-
                     case 2:
+                        objPopup = Resources.Load("Prefab/InputPopupShit") as GameObject;
+                        objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
+                        objPopup.name = "PopUp";
+                        transPop = objPopup.transform;
+                        textpopup = transPop.FindChild("Pop/PopInfoText").GetComponent<Text>();
+                        transPop = objPopup.transform;
+                        transPop.SetParent(GameObject.Find("PopupArea").transform);
+                        transPop.localScale = new Vector3(1, 1, 1);
+                        transPop.localPosition = new Vector3(0, 0, 0);
+
                         poptext = "うんち履歴を登録します\r\n前回\r\n" + poptext + lastshit;
                         break;
+                default:
+                    objPopup = Resources.Load("Prefab/Popup") as GameObject;
+                    objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
+                    objPopup.name = "PopUp";
+                    transPop = objPopup.transform;
+                    textpopup = transPop.FindChild("PopInfoText").GetComponent<Text>();
+
+                    transPop.SetParent(GameObject.Find("PopupArea").transform);
+
+                    transPop.localScale = new Vector3(1, 1, 1);
+                    transPop.localPosition = new Vector3(0, 0, 0);
+
+                    break;
                 }
                 textpopup.text = poptext;
 
@@ -151,22 +177,24 @@ namespace Assets.Script
                 GameObject ngbutton = objPopup.transform.Find("Pop/btnNG").gameObject;
                 Button btnNg = ngbutton.GetComponent<Button>();
                 btnNg.onClick.AddListener(() => ExecNg(argActId));
-            }
-            catch(Exception e)
-            {
-                string dbfileName = "nyanappdb.db";
-                string baseFilePath = Application.streamingAssetsPath + "/" + dbfileName;
-                string filePath = Application.persistentDataPath + "/" + dbfileName;
-                GameObject.Find("ErrorText").GetComponent<Text>().text = e.Message.ToString() + "\r\n" + e.StackTrace.ToString() + "\r\n" + baseFilePath + "\r\n" + filePath + "\r\n" + File.Exists(filePath).ToString();
-            }
         }
 
         public void ExecOk(int argActId)
         {
             try {
-                InsertDb(argActId);
+                switch (argActId) {
+                    case 1:
+                    InsertDb(argActId);
+                        break;
+                    case 2:
+                        GameObject ob = GameObject.Find("PopUp/Pop");
+                        InsertDbShit(argActId,ob.transform.Find("Toggle").GetComponent<Toggle>().isOn,ob.transform.Find("InputField/Text").GetComponent<Text>().text);
+                        break;
+                    default:
+                        break;
+                }
                 MoveScene(3);
-                Destroy(objPopup);
+                //                Destroy(objPopup);
             }
             catch (Exception e)
             {

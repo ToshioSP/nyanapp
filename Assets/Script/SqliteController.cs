@@ -64,6 +64,31 @@ public class SqliteController : MonoBehaviour {
         }
     }
 
+    public void InsertDbShit(int argActionId,bool status ,string memo)
+    {
+        string dbfileName = "nyanappdb.db";
+        string filePath = Application.persistentDataPath + "/" + dbfileName;
+        sqlDB = new SqliteDatabase(filePath);
+        if (status)
+        {
+            memo = "【異】" + memo;
+        }
+        try
+        {
+            string query = "insert into cathistory (catid,action_date,action_time,action_id,memo) values ('" + PlayerPrefs.GetString("SelectCat") + "', date('now', 'localtime') ,time('now', 'localtime'), ";
+            query = query + argActionId.ToString() + ",'" + memo + "')";
+            dataTable = sqlDB.ExecuteQuery(query);
+        }
+        catch (Exception e)
+        {
+            print(e.Message.ToString());
+            print(e.StackTrace);
+            //            string baseFilePath = Application.streamingAssetsPath + "/" + dbfileName;
+            GameObject.Find("ErrorText").GetComponent<Text>().text = e.Message.ToString() + "\r\n" + e.StackTrace.ToString();
+        }
+    }
+
+
     public void InsertDb(int argActionId,string memo)
     {
         try

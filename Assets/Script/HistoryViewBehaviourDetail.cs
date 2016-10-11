@@ -52,6 +52,9 @@ public class HistoryViewBehaviourDetail : MonoBehaviour
                         break;
                     case 2:
                         strText = strText + "糞";
+                        if ((string) dr["memo"] != null){
+                            strText = strText + "メモ：" + (string)dr["memo"];
+                        }
                         break;
                     case 3:
                         strText = strText + "水" + dr["amount"].ToString() + "ml";
