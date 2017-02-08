@@ -33,7 +33,6 @@ namespace Assets.Script
 
         }
         private void Start(){
-            try { 
                 string dbfileName = "nyanappdb.db";
                 string baseFilePath = Application.streamingAssetsPath + "/" + dbfileName;
                 string filePath = Application.persistentDataPath + "/" + dbfileName;
@@ -46,8 +45,14 @@ namespace Assets.Script
 
                 if (!File.Exists(filePath))
                 {
-                //                    www = new WWW("file://" + baseFilePath);
-                    www = new WWW(baseFilePath);
+
+                #if UNITY_EDITOR
+                                www = new WWW("file://" + baseFilePath);
+                #elif UNITY_ANDROID
+                                www = new WWW(baseFilePath);
+                #endif
+                                //                    www = new WWW("file://" + baseFilePath);
+                //                www = new WWW(baseFilePath);
                     print(baseFilePath);
                     while (!www.isDone)
                     {
@@ -57,25 +62,46 @@ namespace Assets.Script
                 }
 
             SqliteDatabase sqlDB = new SqliteDatabase(dbfileName);
-                string query = "select * from catprofile where catid = \"" + PlayerPrefs.GetString("SelectCat") + "\"";
+                string query; 
                 DataTable dataTable;
-                                dataTable = sqlDB.ExecuteQuery(query);
 
-                                                if (dataTable.Rows.Count == 0)
-                                                {
-                                                    query = "select max(catid) as catid from cathistory";
-                                                    dataTable = sqlDB.ExecuteQuery(query);
-                                                    if (dataTable.Rows.Count == 0)
-                                                    {
-                                                        AddCat();
-                                                        query = "select max(catid) as catid from cathistory";
-                                                        dataTable = sqlDB.ExecuteQuery(query);
-                                                        foreach (DataRow dr in dataTable.Rows)
-                                                        {
-                                                            PlayerPrefs.SetString("SelectCat", dr["catid"].ToString());
-                                                        }
-                                                    }
-                                                }
+                
+                // deleted存在確認,なかったら追加
+                query = "SELECT count(*) as exist from sqlite_master where name = 'catprofile' and sql like '%deleted%'";
+                dataTable = sqlDB.ExecuteQuery(query);
+                string exist = null;
+                foreach (DataRow dr in dataTable.Rows)
+                {
+                    exist = dr["exist"].ToString();
+                }
+                if(exist == "0")
+                {
+                query = "ALTER TABLE catprofile ADD COLUMN deleted[boolean] default 0";
+                dataTable = sqlDB.ExecuteQuery(query);
+                query = "update catprofile set birthday = ' '";
+                dataTable = sqlDB.ExecuteQuery(query);
+
+            }
+
+            query = "select * from catprofile where catid = \"" + PlayerPrefs.GetString("SelectCat") + "\"";
+                dataTable = sqlDB.ExecuteQuery(query);
+
+            if (dataTable.Rows.Count == 0)
+            {
+                query = "select max(catid) as catid from catprofile";
+                dataTable = sqlDB.ExecuteQuery(query);
+                if (dataTable.Rows.Count == 0)
+                {
+                    AddCat();
+                    query = "select max(catid) as catid from catprofile where deleted = 0";
+                    dataTable = sqlDB.ExecuteQuery(query);
+                    print(dataTable[0]["catid"].ToString());
+                    foreach (DataRow dr in dataTable.Rows)
+                    {
+                        PlayerPrefs.SetString("SelectCat", dr["catid"].ToString());
+                    }
+                }
+            }
 /*
                 query = "select max(action_date||\" \"||action_time) as a  from cathistory where action_id = 1";
                 dataTable = sqlDB.ExecuteQuery(query);
@@ -85,14 +111,14 @@ namespace Assets.Script
                 */
                 // データ取得処理開始
 
-                query = "select max(action_date||\" \"||action_time) as a  from cathistory where action_id = 1";
+                query = "select max(action_date||\" \"||action_time) as a  from cathistory where action_id = 1 and catid = " + PlayerPrefs.GetString("SelectCat");
                 dataTable = sqlDB.ExecuteQuery(query);
                 foreach (DataRow dr in dataTable.Rows)
                 {
                     lastpiss = dr["a"].ToString();
                 }
 
-                query = "select max(action_date||\" \"||action_time) as a  from cathistory where action_id = 2";
+                query = "select max(action_date||\" \"||action_time) as a  from cathistory where action_id = 2 and catid = " + PlayerPrefs.GetString("SelectCat");
                 dataTable = sqlDB.ExecuteQuery(query);
 
                 foreach (DataRow dr in dataTable.Rows)
@@ -103,14 +129,22 @@ namespace Assets.Script
                 string strWeekday = DateTime.Now.DayOfWeek.ToString();
                 GameObject.Find("Textweekday").GetComponent<Text>().text = strWeekday.Substring(0, 3);
                 GameObject.Find("Textday").GetComponent<Text>().text = DateTime.Today.Month + "/" + DateTime.Today.Day;
-            }
-            catch (Exception e)
-            {
-                string dbfileName = "nyanappdb.db";
-                string baseFilePath = Application.streamingAssetsPath + "/" + dbfileName;
-                string filePath = Application.persistentDataPath + "/" + dbfileName;
-                GameObject.Find("ErrorText").GetComponent<Text>().text = e.Message.ToString() + "\r\n" + e.StackTrace.ToString() + "\r\n" + baseFilePath + "\r\n" + filePath + "\r\n" + File.Exists(filePath).ToString() + "\r\n" + www.bytes.Length.ToString();
-            }
+
+                query = "select catname as a  from catprofile where catid = " + PlayerPrefs.GetString("SelectCat");
+                dataTable = sqlDB.ExecuteQuery(query);
+
+                string catname = "";
+                foreach (DataRow dr in dataTable.Rows)
+                {
+                    catname = dr["a"].ToString();
+                }
+                if (catname.Trim() != "")
+                {
+
+                    GameObject.Find("CatSelect").GetComponent<Text>().text = catname;
+                }
+
+
         }
 
         private void Update()
@@ -131,15 +165,16 @@ namespace Assets.Script
                 switch (argActId)
                 {
                     case 1:
-                        objPopup = Resources.Load("Prefab/Popup") as GameObject;
-                        objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
-                        objPopup.name = "PopUp";
-                        transPop = objPopup.transform;
-                        textpopup = transPop.FindChild("PopInfoText").GetComponent<Text>();
-                        transPop.SetParent(GameObject.Find("PopupArea").transform);
-                        transPop.localScale = new Vector3(1, 1, 1);
-                        transPop.localPosition = new Vector3(0, 0, 0);
-                        poptext = "おしっこ履歴を登録します\r\n前回\r\n" + poptext + lastpiss;
+                    objPopup = Resources.Load("Prefab/InputPopupShit") as GameObject;
+                    objPopup = (GameObject)GameObject.Instantiate(objPopup, new Vector3(0, 0, 0), new Quaternion());
+                    objPopup.name = "PopUp";
+                    transPop = objPopup.transform;
+                    textpopup = transPop.FindChild("Pop/PopInfoText").GetComponent<Text>();
+                    transPop = objPopup.transform;
+                    transPop.SetParent(GameObject.Find("PopupArea").transform);
+                    transPop.localScale = new Vector3(1, 1, 1);
+                    transPop.localPosition = new Vector3(0, 0, 0);
+                    poptext = "おしっこ履歴を登録します\r\n前回\r\n" + poptext + lastpiss;
                         break;
                     case 2:
                         objPopup = Resources.Load("Prefab/InputPopupShit") as GameObject;
@@ -182,19 +217,10 @@ namespace Assets.Script
         public void ExecOk(int argActId)
         {
             try {
-                switch (argActId) {
-                    case 1:
-                    InsertDb(argActId);
-                        break;
-                    case 2:
-                        GameObject ob = GameObject.Find("PopUp/Pop");
-                        InsertDbShit(argActId,ob.transform.Find("Toggle").GetComponent<Toggle>().isOn,ob.transform.Find("InputField").GetComponent<InputField>().text);
-                        break;
-                    default:
-                        break;
-                }
-                MoveScene(3);
-                //                Destroy(objPopup);
+
+                    GameObject ob = GameObject.Find("PopUp/Pop");
+                    InsertDbShit(argActId,ob.transform.Find("Toggle").GetComponent<Toggle>().isOn,ob.transform.Find("InputField").GetComponent<InputField>().text);
+                    MoveScene(3);
             }
             catch (Exception e)
             {
@@ -230,7 +256,7 @@ namespace Assets.Script
 
                     break;
                 case 4:
-                    SceneManager.LoadScene("CatProfile");
+                    SceneManager.LoadScene("CatList");
 
                     break;
 

@@ -153,6 +153,10 @@ namespace Assets.Script
                 string query;
                 switch (argActionId)
                 {
+                    case 1:
+                        query = "insert into cathistory (catid,action_date,action_time,action_id,memo) values ('" + PlayerPrefs.GetString("SelectCat") + "', '" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
+                        query = query + argActionId.ToString() + ",\"" + memo + "\")";
+                        break;
 
                     case 2:
                         query = "insert into cathistory (catid,action_date,action_time,action_id,memo) values ('" + PlayerPrefs.GetString("SelectCat") + "', '" + inputYear.text + "-" + inputDay.text.Substring(0, 2) + "-" + inputDay.text.Substring(2, 2) + "','" + inputTime.text.Substring(0, 2) + ":" + inputTime.text.Substring(2, 2) + ":" + inputTime.text.Substring(4, 2) + "',";
@@ -304,18 +308,31 @@ namespace Assets.Script
 
         public void ExecOk(int argActId)
         {
-                string memo = "";
-
+            string memo = "";
+                GameObject obj;
                 switch (argActId)
                 {
-                    case 2:
-                        GameObject obj = GameObject.Find("PopUp/Pop/");
-                        if (obj.transform.Find("Toggle").GetComponent<Toggle>().isOn)
-                        {
-                            memo = "【異】";
-                        }
-//                        InputField inputfield = 
-                        memo = memo + obj.transform.Find("InputField").GetComponent<InputField>().text;
+                case 1:
+                    obj = GameObject.Find("PopUp/Pop/");
+                    if (obj.transform.Find("Toggle").GetComponent<Toggle>().isOn)
+                    {
+                        memo = "【異】";
+                    }
+                    //                        InputField inputfield = 
+                    memo = memo + obj.transform.Find("InputField").GetComponent<InputField>().text;
+                    print(memo);
+                    InsertDb(argActId, memo);
+
+                    break;
+
+                case 2:
+                    obj = GameObject.Find("PopUp/Pop/");
+                    if (obj.transform.Find("Toggle").GetComponent<Toggle>().isOn)
+                    {
+                        memo = "【異】";
+                    }
+                    //                        InputField inputfield = 
+                    memo = memo + obj.transform.Find("InputField").GetComponent<InputField>().text;
                     print(memo);
                         InsertDb(argActId, memo);
 

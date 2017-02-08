@@ -54,7 +54,6 @@ namespace Assets.Script
 
                         break;
                 }
-                print(query);
 //                DataTable dataTable = 
                     sqlDB.ExecuteQuery(query);
             }

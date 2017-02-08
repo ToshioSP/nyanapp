@@ -23,8 +23,9 @@ public class HistoryViewBehaviourDetail : MonoBehaviour
             //                    string query = "insert into cathistory (action_date,action_id) values ( datetime('now', 'localtime') , ";
             //                    query = query + argActionId.ToString() + ")";
             string query = "select * from cathistory ";
-            query = query + "where action_date =  ";
+            query = query + " where action_date =  ";
             query = query + "\"" + CareHistory.strData + "\" ";
+            query = query + " and catid = " + PlayerPrefs.GetString("SelectCat");
             query = query + strOrder;
             //            string query = "delete from cathistory ";
             print(query);
@@ -49,6 +50,10 @@ public class HistoryViewBehaviourDetail : MonoBehaviour
                 {
                     case 1:
                         strText = strText + "尿";
+                        if ((string)dr["memo"] != "")
+                        {
+                            strText = strText + "メモ：" + (string)dr["memo"];
+                        }
                         break;
                     case 2:
                         strText = strText + "糞";

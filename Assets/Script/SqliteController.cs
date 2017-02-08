@@ -22,7 +22,7 @@ public class SqliteController : MonoBehaviour {
     public void AddCat(string catName = null, string sex = null, string birthday = null)
     {
 
-        catName = catName ?? "1";
+        catName = catName ?? "猫1";
         sex = sex ?? "3";
 
         string dbfileName = "nyanappdb.db";

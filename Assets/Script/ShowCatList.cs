@@ -26,13 +26,19 @@ public class ShowCatList : SqliteController
         try
         {
             SqliteDatabase sqlDB = new SqliteDatabase(filePath);
-            string query = "select * from catprofile order by 1";
+            string query = "select * from catprofile where deleted = 0 order by 1 desc";
             DataTable dataTable = sqlDB.ExecuteQuery(query);
             if(dataTable.Rows.Count == 0)
             {
                 AddCat();
+                query = "select * from catprofile where deleted = 0 order by 1 desc";
+                dataTable = sqlDB.ExecuteQuery(query);
+                PlayerPrefs.SetString("SelectCat", dataTable[0]["catid"].ToString());
             }
-            dataTable = sqlDB.ExecuteQuery(query);
+            else{
+                Text z = GameObject.Find("TextHistory").GetComponent<Text>();
+                z.text = z.text + dataTable[0]["catname"].ToString();
+            }
 
             foreach (DataRow dr in dataTable.Rows)
             {
@@ -45,11 +51,20 @@ public class ShowCatList : SqliteController
                 GameObject objButton = objItem.transform.GetChild(0).gameObject;
                 Button button = objButton.GetComponent<Button>();
                 string catId = dr["catid"].ToString();
-
-                catName = dr["catname"].ToString();
+                string memo = "";
+                if (dr["catname"].ToString().Trim() != "")
+                {
+                    catName = dr["catname"].ToString();
+                    memo = dr["birthday"].ToString();
+                }
+                else
+                {
+                    catName = "名称未登録";
+                }
 //                string birthday = dr["birthday"].ToString();
                 SetListener(button,catId );
                 string strText = catName ;
+                strText = strText + " " + memo;
                   text.text = strText;
                 
             }
@@ -57,7 +72,6 @@ public class ShowCatList : SqliteController
         catch (Exception e)
         {
             GameObject.Find("TextHistory").GetComponent<Text>().text = e.Message.ToString() + e.StackTrace.ToString();
-
         }
     }
 
@@ -136,9 +150,9 @@ public class ShowCatList : SqliteController
     {
         Transform transPop;
         GameObject objProfPopup;
-        objProfPopup = Resources.Load("Prefab/CatPlofilePop") as GameObject;
+        objProfPopup = Resources.Load("Prefab/CatProfilePop") as GameObject;
         objProfPopup = (GameObject)GameObject.Instantiate(objProfPopup, new Vector3(0, 0, 0), new Quaternion());
-        objProfPopup.name = "CatPlofilePop";
+        objProfPopup.name = "CatProfilePop";
         transPop = objProfPopup.transform;
         transPop.SetParent(objCanvas.transform);
 
@@ -189,7 +203,7 @@ public class ShowCatList : SqliteController
             DataTable dataTable = sqlDB.ExecuteQuery(query);
             dataTable = sqlDB.ExecuteQuery(query);
 
-            SceneManager.LoadScene("CatProfile");
+            SceneManager.LoadScene("CatList");
 
 
         }
@@ -232,16 +246,32 @@ public class ShowCatList : SqliteController
         try
         {
             SqliteDatabase sqlDB = new SqliteDatabase(filePath);
-            string query = "delete from catprofile where catid = ";
+            string query = "update catprofile set deleted = 1 where catid = ";
             query = query + argCatID;
-            print(query);
             DataTable dataTable = sqlDB.ExecuteQuery(query);
+
+            if (argCatID == PlayerPrefs.GetString("SelectCat")) {
+                sqlDB = new SqliteDatabase(filePath);
+                query = "select max(catid) id from catprofile where deleted = 0";
+                dataTable = sqlDB.ExecuteQuery(query);
+                if (dataTable.Rows.Count <= 0)
+                {
+                    PlayerPrefs.SetString("SelectCat","0");
+                }
+                else
+                {
+                    PlayerPrefs.SetString("SelectCat", dataTable[0]["id"].ToString());
+                }
+
+            }
+            SceneManager.LoadScene("CatList");
+
         }
         catch (Exception e)
         {
             GameObject.Find("TextHistory").GetComponent<Text>().text = e.Message.ToString() + e.StackTrace.ToString();
         }
-        SceneManager.LoadScene("CatProfile");
+
     }
 
 
